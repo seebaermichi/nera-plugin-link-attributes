@@ -1,0 +1,3 @@
+regex: (href="(?:http|www).[^"]+")
+attributes:
+  - target="_blank"
