@@ -1,10 +1,72 @@
-# Add attributes to external links - Nera plugin
-This is a tiny plugin which will add attributes to all the  
-links in your content where the url starts with _http_ or _www_.
+# @nera-static/plugin-link-attributes
 
-## Usage
-To use this plugin just add it to your `/src/plugins` folder. It should work out  
-of the box.  
-In addition to the already added attribute `target="_blank"` you could add more  
-attributes like `class` etc. to the `config/link-attribute.yaml` file. They will  
-be added as well.
+A plugin for the [Nera](https://github.com/seebaermichi/nera) static site generator that automatically adds attributes to external links (e.g. `target="_blank"` and `rel="noopener noreferrer"`). Ensures external links are secure and SEO-friendly.
+
+## ✨ Features
+
+-   Automatically adds attributes to links starting with `http` or `www`
+-   Prevents overwriting existing attributes
+-   Uses a safe and structured HTML parser (Cheerio)
+-   Configuration via `link-attributes.yaml`
+-   Lightweight and zero-runtime
+
+## 🚀 Installation
+
+Install the plugin in your Nera project:
+
+```bash
+npm install @nera-static/plugin-link-attributes
+```
+
+Then copy the default configuration into your project:
+
+```bash
+npx @nera-static/plugin-link-attributes run publish-config
+```
+
+This creates a file at:
+
+```
+config/
+└── link-attributes.yaml
+```
+
+Nera will automatically detect the plugin and apply the transformations during the build.
+
+## ⚙️ Configuration
+
+Example `config/link-attributes.yaml`:
+
+```yaml
+attributes:
+    - target="_blank"
+    - rel="noopener noreferrer"
+```
+
+-   `target="_blank"`: Opens external links in a new tab.
+-   `rel="noopener noreferrer"`: Prevents security vulnerabilities and hides referrer.
+-   You can add any other valid HTML attributes like `class="external"` or `aria-label="..."`.
+
+The plugin will not overwrite existing attributes on links.
+
+## 🧪 Development
+
+```bash
+npm install
+npm test
+```
+
+Tests use [Vitest](https://vitest.dev) and validate that:
+
+-   Attributes are added only to external links
+-   Existing attributes are preserved
+-   Invalid or internal links are skipped
+
+## 🧑‍💻 Author
+
+Michael Becker  
+[GitHub](https://github.com/seebaermichi)
+
+## 📦 License
+
+MIT

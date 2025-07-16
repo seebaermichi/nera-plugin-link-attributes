@@ -1,26 +1,40 @@
-const { getConfig } = require('../plugin-helper')
+import path from 'path'
+import { load } from 'cheerio'
+import { getConfig } from '@nera-static/plugin-utils'
 
-module.exports = (() => {
-    const config = getConfig(`${__dirname}/config/link-attributes.yaml`)
+const HOST_CONFIG_PATH = path.resolve(
+    process.cwd(),
+    'config/link-attributes.yaml'
+)
 
-    const setTargetBlank = content => {
-        const regex = new RegExp(config.regex, 'gm')
+const config = getConfig(HOST_CONFIG_PATH)
 
-        return content.replace(regex, '$1 ' + config.attributes.join(' '))
-    }
+function addAttributesToLinks(content) {
+    const $ = load(content)
 
-    const getMetaData = data => {
-        data.pagesData = data.pagesData.map(({ content, meta }) => {
-            return {
-                content: setTargetBlank(content),
-                meta
+    $('a[href^="http"], a[href^="www"]').each((_, el) => {
+        const $el = $(el)
+
+        config.attributes.forEach((attr) => {
+            const [name, value] = attr.split('=')
+            if (!$el.attr(name)) {
+                $el.attr(name, value?.replace(/^"|"$/g, '') ?? true)
             }
         })
+    })
 
+    return $.html()
+}
+
+export function getAppData(data) {
+    if (!config) {
         return data.pagesData
     }
 
-    return {
-        getMetaData
-    }
-})()
+    return data.pagesData.map(({ content, meta }) => {
+        return {
+            content: addAttributesToLinks(content),
+            meta,
+        }
+    })
+}
