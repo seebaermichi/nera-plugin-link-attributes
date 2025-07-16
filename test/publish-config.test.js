@@ -34,7 +34,7 @@ describe('publish-config script', () => {
         fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true })
         fs.writeFileSync(CONFIG_PATH, 'existing config')
 
-        const output = execSync(`node ${SCRIPT_PATH}`, {
+        execSync(`node ${SCRIPT_PATH}`, {
             cwd: TEST_DIR,
         }).toString()
 
