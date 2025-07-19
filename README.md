@@ -65,7 +65,13 @@ Tests use [Vitest](https://vitest.dev) and validate that:
 ## 🧑‍💻 Author
 
 Michael Becker  
-[GitHub](https://github.com/seebaermichi)
+[https://github.com/seebaermichi](https://github.com/seebaermichi)
+
+## 🔗 Links
+
+-   [Plugin Repository](https://github.com/seebaermichi/nera-plugin-link-attributes)
+-   [NPM Package](https://www.npmjs.com/package/@nera-static/plugin-link-attributes)
+-   [Nera Static Site Generator](https://github.com/seebaermichi/nera)
 
 ## 📦 License
 
