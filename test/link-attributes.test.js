@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { getAppData } from '../index.js'
+import { getMetaData } from '../index.js'
 
-describe('getAppData', () => {
+describe('getMetaData', () => {
     it('adds target="_blank" to external links', () => {
         const mockData = {
             pagesData: [
@@ -21,7 +21,7 @@ describe('getAppData', () => {
             ],
         }
 
-        const result = getAppData(mockData)
+        const result = getMetaData(mockData)
 
         expect(result[0].content).toContain('target="_blank"')
         expect(result[1].content).toContain('target="_blank"')
@@ -44,7 +44,7 @@ describe('getAppData', () => {
             ],
         }
 
-        const result = getAppData(data)
+        const result = getMetaData(data)
 
         // Confirm existing values remain unchanged
         expect(result[0].content).toContain('target="_self"')
@@ -66,7 +66,7 @@ describe('getAppData', () => {
             ],
         }
 
-        const result = getAppData(data)
+        const result = getMetaData(data)
 
         expect(result[0].content).toContain('target="_blank"')
     })

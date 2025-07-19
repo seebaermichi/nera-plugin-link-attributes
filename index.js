@@ -26,7 +26,7 @@ function addAttributesToLinks(content) {
     return $.html()
 }
 
-export function getAppData(data) {
+export function getMetaData(data) {
     if (!config) {
         return data.pagesData
     }
