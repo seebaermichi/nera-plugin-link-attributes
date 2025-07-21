@@ -1,6 +1,6 @@
 {
     "name": "@nera-static/plugin-link-attributes",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "description": "A plugin for static side generator Nera to add attributes to external links.",
     "main": "index.js",
     "scripts": {
@@ -12,9 +12,14 @@
     "exports": {
         ".": "./index.js"
     },
+    "bin": {
+        "nera-link-attributes": "./bin/publish-config.js"
+    },
     "files": [
+        "bin",
         "config",
-        "index.js"
+        "index.js",
+        "CHANGELOG.md"
     ],
     "keywords": [
         "nera",
