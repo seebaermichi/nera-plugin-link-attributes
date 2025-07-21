@@ -8,9 +8,10 @@ const HOST_CONFIG_PATH = path.resolve(
 )
 
 const config = getConfig(HOST_CONFIG_PATH)
+const cheerioLoad = load
 
 function addAttributesToLinks(content) {
-    const $ = load(content)
+    const $ = cheerioLoad(content, null, false)
 
     $('a[href^="http"], a[href^="www"]').each((_, el) => {
         const $el = $(el)
