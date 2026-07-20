@@ -11,15 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      # package.json says engines >= 18, but this package cannot honour that:
-      # cheerio is a *runtime* dependency here and cheerio 1.2.0 itself
-      # declares engines >= 20.18.1 (it pulls in undici, which needs a global
-      # `File`). So unlike the repos where cheerio is dev-only, consumers on
-      # Node 18 are genuinely affected, not just CI.
-      #
-      # Testing 18 would therefore fail for a real reason. Raising engines to
-      # >= 20 is the actual fix, but that is a major bump and a fleet-wide
-      # decision — tracked in audit/NEXT-STEPS.md for Session 7.
+      # Matches engines: >= 20.18.1. cheerio is a runtime dependency here, and
+      # every current cheerio 1.x pulls in an undici needing a global `File`
+      # (Node 20+), so this package genuinely cannot run on Node 18 — unlike
+      # the repos where cheerio is dev-only and the problem is CI-only.
       matrix:
         node-version: [20, 22]
 

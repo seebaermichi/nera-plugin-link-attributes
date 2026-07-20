@@ -31,6 +31,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     edits to `config/link-attributes.yaml` take effect without a restart
 -   `@nera-static/plugin-utils` range raised from `^1.0.3` to `^1.2.0`, in line
     with the rest of the plugin fleet
+-   **`engines.node` corrected from `>=18` to `>=20.18.1`.** This is not a drop
+    of Node 18 support — it documents that support has not existed in practice.
+    `cheerio` is a runtime dependency here, and every current cheerio 1.x pulls
+    in an `undici` that needs a global `File` (Node 20+), so on Node 18 the
+    plugin fails to load with `ReferenceError: File is not defined`. Nera
+    catches that and continues, so the build *succeeds* with external links
+    left unprocessed — a silent wrong result rather than an error. Verified on
+    Node 18.20.8. Pinning cheerio does not avoid it: `cheerio@1.1.0` fails
+    identically despite advertising `>=18.17`
 
 ### Documentation
 

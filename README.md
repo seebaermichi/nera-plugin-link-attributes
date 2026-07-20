@@ -112,7 +112,9 @@ Michael Becker
 ## 🧩 Compatibility
 
 - **Nera**: v4.1.0+
-- **Node.js**: >= 18
+- **Node.js**: >= 20.18.1 — required by `cheerio`, which this plugin uses at
+  runtime. On Node 18 the plugin fails to load and your external links are
+  silently left unprocessed
 - **Plugin API**: Uses `getMetaData()` for HTML transformation
 
 ## 📦 License
