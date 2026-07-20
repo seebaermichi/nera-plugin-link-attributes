@@ -1,5 +1,8 @@
 # @nera-static/plugin-link-attributes
 
+[![Test](https://github.com/seebaermichi/nera-plugin-link-attributes/actions/workflows/test.yml/badge.svg)](https://github.com/seebaermichi/nera-plugin-link-attributes/actions/workflows/test.yml)
+[![npm version](https://img.shields.io/npm/v/@nera-static/plugin-link-attributes)](https://www.npmjs.com/package/@nera-static/plugin-link-attributes)
+
 A plugin for the [Nera](https://github.com/seebaermichi/nera) static site generator that automatically adds attributes to external links (e.g. `target="_blank"` and `rel="noopener noreferrer"`). Ensures external links are secure, accessible, and SEO-friendly.
 
 ## ✨ Features
