@@ -41,6 +41,38 @@ describe('publish-config script', () => {
         const result = fs.readFileSync(CONFIG_PATH, 'utf8')
         expect(result).toBe('existing config')
     })
+
+    it('overwrites an existing config when --force is passed', () => {
+        fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true })
+        fs.writeFileSync(CONFIG_PATH, 'existing config')
+
+        execSync(`node ${SCRIPT_PATH} --force`, { cwd: TEST_DIR })
+
+        const result = fs.readFileSync(CONFIG_PATH, 'utf8')
+        expect(result).not.toBe('existing config')
+        expect(result).toContain('target="_blank"')
+    })
+
+    it('tells the user about --force when it skips', () => {
+        fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true })
+        fs.writeFileSync(CONFIG_PATH, 'existing config')
+
+        const output = execSync(`node ${SCRIPT_PATH}`, {
+            cwd: TEST_DIR,
+        }).toString()
+
+        expect(output).toContain('--force')
+    })
+
+    it('refuses to run outside a project root', () => {
+        fs.rmSync(path.join(TEST_DIR, 'package.json'))
+
+        expect(() =>
+            execSync(`node ${SCRIPT_PATH}`, { cwd: TEST_DIR, stdio: 'pipe' })
+        ).toThrow()
+
+        expect(fs.existsSync(CONFIG_PATH)).toBe(false)
+    })
 })
 
 afterAll(() => {

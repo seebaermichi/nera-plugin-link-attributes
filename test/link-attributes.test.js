@@ -1,9 +1,41 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
 import { getMetaData } from '../index.js'
+
+let cwd
+let originalCwd
+
+// The plugin reads config from process.cwd(). Running these in the repo picks
+// up the package's *own* config/link-attributes.yaml — a file no consumer ever
+// has, since the shipped config is documentation and is never merged into a
+// site. That is precisely why the old suite was green while the plugin crashed
+// for real users. Every test here starts from an empty temp cwd and opts in.
+beforeEach(() => {
+    originalCwd = process.cwd()
+    cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'nera-link-attributes-'))
+    process.chdir(cwd)
+})
+
+afterEach(() => {
+    process.chdir(originalCwd)
+    fs.rmSync(cwd, { recursive: true, force: true })
+})
+
+const writeConfig = (yaml) => {
+    fs.mkdirSync(path.join(cwd, 'config'), { recursive: true })
+    fs.writeFileSync(path.join(cwd, 'config/link-attributes.yaml'), yaml, 'utf-8')
+}
+
+const defaultConfig = () =>
+    writeConfig('attributes:\n  - target="_blank"\n  - rel="noopener noreferrer"\n')
 
 describe('getMetaData', () => {
     it('adds target="_blank" to external links', () => {
-        const mockData = {
+        defaultConfig()
+
+        const result = getMetaData({
             pagesData: [
                 {
                     content:
@@ -19,9 +51,7 @@ describe('getMetaData', () => {
                     meta: { title: 'Internal' },
                 },
             ],
-        }
-
-        const result = getMetaData(mockData)
+        })
 
         expect(result[0].content).toContain('target="_blank"')
         expect(result[1].content).toContain('target="_blank"')
@@ -29,7 +59,9 @@ describe('getMetaData', () => {
     })
 
     it('does not overwrite existing attributes on external links', () => {
-        const data = {
+        defaultConfig()
+
+        const result = getMetaData({
             pagesData: [
                 {
                     content:
@@ -42,32 +74,96 @@ describe('getMetaData', () => {
                     meta: {},
                 },
             ],
-        }
+        })
 
-        const result = getMetaData(data)
-
-        // Confirm existing values remain unchanged
         expect(result[0].content).toContain('target="_self"')
         expect(result[1].content).toContain('target="_blank"')
 
-        // Confirm no duplicate target was added
         const targetAttrCount = (result[0].content.match(/target=/g) || [])
             .length
         expect(targetAttrCount).toBe(1)
     })
 
     it('adds attribute to www. links', () => {
-        const data = {
-            pagesData: [
-                {
-                    content: '<a href="www.example.com">WWW</a>',
-                    meta: {},
-                },
-            ],
-        }
+        defaultConfig()
 
-        const result = getMetaData(data)
+        const result = getMetaData({
+            pagesData: [{ content: '<a href="www.example.com">WWW</a>', meta: {} }],
+        })
 
         expect(result[0].content).toContain('target="_blank"')
+    })
+
+    it('applies every configured attribute', () => {
+        defaultConfig()
+
+        const result = getMetaData({
+            pagesData: [
+                { content: '<a href="https://example.com">Ext</a>', meta: {} },
+            ],
+        })
+
+        expect(result[0].content).toContain('target="_blank"')
+        expect(result[0].content).toContain('rel="noopener noreferrer"')
+    })
+
+    // Regression: getConfig returns {} for a missing file, so the old
+    // `if (!config)` guard never fired and execution reached
+    // `config.attributes.forEach` with attributes undefined. It only threw
+    // once a page actually contained an external link, so it presented as
+    // intermittent — a site worked until someone added an outbound link.
+    describe('with no config/link-attributes.yaml present', () => {
+        it('does not throw on a page containing an external link', () => {
+            const pagesData = [
+                {
+                    content: '<p><a href="https://example.com">Ext</a></p>',
+                    meta: { title: 'Ext' },
+                },
+            ]
+
+            expect(() => getMetaData({ pagesData })).not.toThrow()
+        })
+
+        it('returns the pages unchanged', () => {
+            const content = '<p><a href="https://example.com">Ext</a></p>'
+            const pagesData = [{ content, meta: { title: 'Ext' } }]
+
+            const result = getMetaData({ pagesData })
+
+            expect(result).toHaveLength(1)
+            expect(result[0].content).toBe(content)
+            expect(result[0].meta).toEqual({ title: 'Ext' })
+        })
+    })
+
+    it('passes pages through when attributes is an empty list', () => {
+        writeConfig('attributes: []\n')
+
+        const content = '<a href="https://example.com">Ext</a>'
+        const result = getMetaData({ pagesData: [{ content, meta: {} }] })
+
+        expect(result[0].content).toBe(content)
+    })
+
+    it('passes pages through when the config has no attributes key', () => {
+        writeConfig('something_else: true\n')
+
+        const content = '<a href="https://example.com">Ext</a>'
+        const result = getMetaData({ pagesData: [{ content, meta: {} }] })
+
+        expect(result[0].content).toBe(content)
+    })
+
+    it('picks up config edits without a restart', () => {
+        writeConfig('attributes:\n  - rel="nofollow"\n')
+
+        const result = getMetaData({
+            pagesData: [
+                { content: '<a href="https://example.com">Ext</a>', meta: {} },
+            ],
+        })
+
+        expect(result[0].content).toContain('rel="nofollow"')
+        expect(result[0].content).not.toContain('target="_blank"')
     })
 })

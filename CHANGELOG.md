@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-07-20
+
+### Added
+
+-   `--force` flag on `nera-link-attributes`, to replace an existing
+    `config/link-attributes.yaml` with a fresh copy of the shipped defaults.
+    Without it the command still skips, as before, and now says so
+
+### Fixed
+
+-   **no longer crashes the build when `config/link-attributes.yaml` is
+    absent.** The guard was `if (!config)`, but `getConfig` returns `{}` for a
+    missing file, so it never fired and execution reached
+    `config.attributes.forEach` with `attributes` undefined —
+    `TypeError: Cannot read properties of undefined (reading 'forEach')`. It
+    only threw once a page actually contained an external link, so it looked
+    intermittent: a site built fine until someone added an outbound link.
+    Pages now pass through unchanged when no attributes are configured, which
+    is what the dead guard had always intended
+
+### Changed
+
+-   configuration is read inside `getMetaData` rather than at module load, so
+    edits to `config/link-attributes.yaml` take effect without a restart
+-   `@nera-static/plugin-utils` range raised from `^1.0.3` to `^1.2.0`, in line
+    with the rest of the plugin fleet
+
+### Documentation
+
+-   publishing the config is now documented as **optional**, and the README no
+    longer implies the build depends on it
+-   fixed an invalid `npx` invocation; the command is `npx nera-link-attributes`
+
 ## [2.0.4] - 2025-07-21
 
 ### Fixed

@@ -2,21 +2,13 @@ import path from 'path'
 import { load } from 'cheerio'
 import { getConfig } from '@nera-static/plugin-utils'
 
-const HOST_CONFIG_PATH = path.resolve(
-    process.cwd(),
-    'config/link-attributes.yaml'
-)
-
-const config = getConfig(HOST_CONFIG_PATH)
-const cheerioLoad = load
-
-function addAttributesToLinks(content) {
-    const $ = cheerioLoad(content, null, false)
+function addAttributesToLinks(content, attributes) {
+    const $ = load(content, null, false)
 
     $('a[href^="http"], a[href^="www"]').each((_, el) => {
         const $el = $(el)
 
-        config.attributes.forEach((attr) => {
+        attributes.forEach((attr) => {
             const [name, value] = attr.split('=')
             if (!$el.attr(name)) {
                 $el.attr(name, value?.replace(/^"|"$/g, '') ?? true)
@@ -28,13 +20,22 @@ function addAttributesToLinks(content) {
 }
 
 export function getMetaData(data) {
-    if (!config) {
+    // Config is read here rather than at module load so edits take effect
+    // without a restart, and so tests can point at a temporary cwd.
+    const config = getConfig(
+        path.resolve(process.cwd(), 'config/link-attributes.yaml')
+    )
+
+    // `getConfig` returns {} for a missing file, so a plain `!config` check is
+    // always false. Without a configured attribute list there is nothing to
+    // add, so pass the pages through untouched rather than crashing.
+    if (!config.attributes?.length) {
         return data.pagesData
     }
 
     return data.pagesData.map(({ content, meta }) => {
         return {
-            content: addAttributesToLinks(content),
+            content: addAttributesToLinks(content, config.attributes),
             meta,
         }
     })

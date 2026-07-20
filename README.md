@@ -22,7 +22,7 @@ npm install @nera-static/plugin-link-attributes
 Then publish the default configuration:
 
 ```bash
-npx @nera-static/plugin-link-attributes run publish-config
+npx nera-link-attributes
 ```
 
 This creates:
@@ -31,6 +31,18 @@ This creates:
 config/
 └── link-attributes.yaml
 ```
+
+If `config/link-attributes.yaml` already exists it is left alone, so re-running
+the command never overwrites your edits. To replace it with a fresh copy of the
+shipped defaults:
+
+```bash
+npx nera-link-attributes --force
+```
+
+Publishing the config is **optional**. Without it — or with a config that
+defines no `attributes` — the plugin passes every page through unchanged
+instead of adding attributes. It will not fail the build.
 
 Nera will automatically detect the plugin and apply the transformations during the build.
 
@@ -82,6 +94,9 @@ Tests use [Vitest](https://vitest.dev) and validate:
 - Internal or malformed links are ignored
 - Existing attributes are preserved
 - Output HTML remains valid and clean
+- Pages pass through untouched when no config is present, when `attributes` is
+  empty, and when the config has no `attributes` key
+- Config edits are picked up without a restart
 
 ## 🧑‍💻 Author
 

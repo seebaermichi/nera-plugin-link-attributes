@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const cwd = process.cwd()
+const force = process.argv.includes('--force')
 
 // Safety check: block running from inside node_modules
 const targetPkgJson = path.resolve(cwd, 'package.json')
@@ -21,8 +22,11 @@ const target = path.resolve(cwd, 'config/link-attributes.yaml')
 
 fs.mkdirSync(path.dirname(target), { recursive: true })
 
-if (fs.existsSync(target)) {
-    console.log('⚠️ config/link-attributes.yaml already exists. Skipping.')
+if (fs.existsSync(target) && !force) {
+    console.log(
+        '⚠️ config/link-attributes.yaml already exists. Skipping.\n' +
+            '    Re-run with --force to overwrite (this will discard your edits).'
+    )
     process.exit(0)
 }
 
