@@ -1,35 +1,36 @@
-name: 🧪 Run Tests
+name: Test
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    push:
+        branches: [main, master]
+    pull_request:
+        branches: [main, master]
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      # Matches engines: >= 20.18.1. cheerio is a runtime dependency here, and
-      # every current cheerio 1.x pulls in an undici needing a global `File`
-      # (Node 20+), so this package genuinely cannot run on Node 18 — unlike
-      # the repos where cheerio is dev-only and the problem is CI-only.
-      matrix:
-        node-version: [20, 22]
+    test:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        strategy:
+            fail-fast: false
+            matrix:
+                # Node 18 is deliberately absent: cheerio pulls in `undici`,
+                # which needs a global `File` (Node 20+).
+                node-version: [20, 22]
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: npm install
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'npm'
 
-      - name: Run tests
-        run: npm test
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run linter
+              run: npm run lint
+
+            - name: Run tests
+              run: npx vitest run
