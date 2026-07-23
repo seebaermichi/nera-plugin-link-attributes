@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2026-07-23
+
+### Fixed
+
+-   **attribute values containing `=` are no longer truncated.** The parser
+    split each entry on **every** `=` (`attr.split('=')`) and kept only the
+    first two fields, so a value with a query string or `data-*` payload lost
+    everything after its first `=` —
+    `data-track="src=nav&type=ext"` became `data-track="src"`. It now splits on
+    the first `=` only, so the whole value is preserved. Attributes whose value
+    contains no `=` (including both shipped defaults) are unaffected
+
+### Documentation
+
+-   added a `## 🤝 Contributing` section linking the Nera contributing guide
+-   Development section now uses `npx vitest run` and notes that `npm test` is
+    watch mode
+-   Compatibility now states the `@nera-static/plugin-utils` range (`^1.2.0`)
+
 ## [2.1.0] - 2026-07-20
 
 ### Added

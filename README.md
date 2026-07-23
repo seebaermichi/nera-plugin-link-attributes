@@ -87,9 +87,12 @@ No usage setup required – all external links in rendered HTML will be automati
 
 ```bash
 npm install
-npm test
+npx vitest run
 npm run lint
 ```
+
+`npm test` runs Vitest in **watch mode**, so use `npx vitest run` for a single
+pass.
 
 Tests use [Vitest](https://vitest.dev) and validate:
 
@@ -101,9 +104,24 @@ Tests use [Vitest](https://vitest.dev) and validate:
   empty, and when the config has no `attributes` key
 - Config edits are picked up without a restart
 
+## 🤝 Contributing
+
+Issues and pull requests are welcome. See the
+[Nera contributing guide](https://github.com/seebaermichi/nera/blob/main/CONTRIBUTING.md)
+for plugin development, the hook contract, and local setup.
+
+For this repo specifically:
+
+- `npx vitest run` and `npm run lint` must pass (`npm test` is watch mode).
+- Bump the version and update `CHANGELOG.md` **in the same commit** as the change.
+- The `attributes` config key and the rule for which links count as external
+  (`href` starting with `http` or `www`) are a **public contract** — renaming
+  the key or changing the selector is a **major** bump.
+- Releases publish from CI on a pushed `v*` tag. Never run `npm publish`.
+
 ## 🧑‍💻 Author
 
-Michael Becker
+Michael Becker  
 [https://github.com/seebaermichi](https://github.com/seebaermichi)
 
 ## 🔗 Links
@@ -118,6 +136,7 @@ Michael Becker
 - **Node.js**: >= 20.18.1 — required by `cheerio`, which this plugin uses at
   runtime. On Node 18 the plugin fails to load and your external links are
   silently left unprocessed
+- **Plugin Utils**: ^1.2.0
 - **Plugin API**: Uses `getMetaData()` for HTML transformation
 
 ## 📦 License

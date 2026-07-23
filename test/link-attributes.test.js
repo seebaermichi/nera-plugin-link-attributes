@@ -154,6 +154,28 @@ describe('getMetaData', () => {
         expect(result[0].content).toBe(content)
     })
 
+    // Regression: `attr.split('=')` dropped everything after the first `=`, so
+    // a value containing `=` (a query string, a `data-*` payload) was silently
+    // truncated — `data-track="src=nav&type=ext"` became `data-track="src"`.
+    // Splitting on the first `=` only keeps the whole value intact.
+    it('preserves attribute values that contain "="', () => {
+        writeConfig(
+            'attributes:\n' +
+                '  - data-track="src=nav&type=ext"\n' +
+                '  - aria-label="opens = external"\n'
+        )
+
+        const result = getMetaData({
+            pagesData: [
+                { content: '<a href="https://example.com">Ext</a>', meta: {} },
+            ],
+        })
+
+        // `=` in the value is preserved; cheerio correctly HTML-escapes the `&`.
+        expect(result[0].content).toContain('data-track="src=nav&amp;type=ext"')
+        expect(result[0].content).toContain('aria-label="opens = external"')
+    })
+
     it('picks up config edits without a restart', () => {
         writeConfig('attributes:\n  - rel="nofollow"\n')
 

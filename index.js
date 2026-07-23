@@ -9,7 +9,12 @@ function addAttributesToLinks(content, attributes) {
         const $el = $(el)
 
         attributes.forEach((attr) => {
-            const [name, value] = attr.split('=')
+            // Split on the first `=` only. A value may itself contain `=` — a
+            // query string, a `data-*` payload — and a plain `split('=')` drops
+            // everything after the first one, silently corrupting the value.
+            const eq = attr.indexOf('=')
+            const name = eq === -1 ? attr : attr.slice(0, eq)
+            const value = eq === -1 ? undefined : attr.slice(eq + 1)
             if (!$el.attr(name)) {
                 $el.attr(name, value?.replace(/^"|"$/g, '') ?? true)
             }
