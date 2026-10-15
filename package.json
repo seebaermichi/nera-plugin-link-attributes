@@ -14,7 +14,7 @@
         ".": "./index.js"
     },
     "bin": {
-        "nera-link-attributes": "./bin/publish-config.js"
+        "nera-link-attributes": "bin/publish-config.js"
     },
     "files": [
         "bin",
@@ -37,7 +37,7 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/seebaermichi/nera-plugin-link-attributes"
+        "url": "git+https://github.com/seebaermichi/nera-plugin-link-attributes.git"
     },
     "bugs": {
         "url": "https://github.com/seebaermichi/nera-plugin-link-attributes/issues"
